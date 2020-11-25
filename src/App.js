@@ -1,8 +1,38 @@
+import HeaderBar from './components/HeaderBar';
+import Dashboard from './components/Dashboard';
+import CoursesView from './components/CoursesView';
+import AddCourseView from './components/AddCourseView';
+import useCourses from './hooks/useCourses';
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+
+
 function App() {
+
+  const courses = useCourses();
   return (
-    <div className="App">
-      <h1>Codehub React App</h1>
-    </div>
+    <Router>
+      <div className="App">
+        <section>
+          <HeaderBar />
+        </section>
+        <Switch>
+          <Route exact path="/">
+            <Dashboard />
+          </Route>
+          <Route exact path="/all">
+            <CoursesView courses={courses} type="cards"/>
+          </Route>
+          <Route exact path="/add">
+            <AddCourseView />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
