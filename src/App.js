@@ -1,6 +1,7 @@
 import HeaderBar from './components/HeaderBar';
 import Dashboard from './components/Dashboard';
 import CoursesView from './components/CoursesView';
+import CourseView from './components/CourseView';
 import AddCourseView from './components/AddCourseView';
 import useCourses from './hooks/useCourses';
 
@@ -30,6 +31,7 @@ function App() {
           <Route exact path="/add">
             <AddCourseView />
           </Route>
+          <Route exact path="/view/:courseId" component={CourseView}/>
         </Switch>
       </div>
     </Router>

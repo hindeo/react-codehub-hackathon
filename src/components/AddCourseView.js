@@ -1,46 +1,11 @@
-import { useEffect, useState } from 'react';
 import { Jumbotron, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { INSTRUCTORS } from '../api';
+import { COURSES } from '../api';
+import {useCourse, useInstructors} from '../hooks';
 
 export default function AddCourseView() {
 
-  const [instructors, setInstructors] = useState([]);
-  const [course, setCourse] = useState({
-    title: '',
-    imagePath: '',
-    price: {
-      normal: null,
-      early_bird: null
-    },
-    dates: {
-      start_date: '',
-      end_date: '',
-    },
-    duration: '',
-    open: false,
-    instructors: [],
-    description: ''
-  });
-
-  useEffect(() => {
-    fetch(INSTRUCTORS)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Something went wrong ...');
-        }
-      })
-      .then(data => {
-        setInstructors(data);
-        //setLoading(false);
-      })
-      .catch(error => {
-        console.log(error)
-      });
-
-    console.log('COURSE FORM DATA: ', course);
-  }, [course]);
+  const [instructors] = useInstructors([]);
+  const [course, setCourse] = useCourse();
 
   return (
     <Jumbotron>
@@ -82,7 +47,6 @@ export default function AddCourseView() {
                     const value = e.target.value;
                     setCourse(prevState => {
                       let newInstructors = [...prevState.instructors];
-                      console.log('newInstrucotrs before', newInstructors);
                       if (checked) {
                         newInstructors = newInstructors.concat(value);
                       } else {
@@ -91,8 +55,7 @@ export default function AddCourseView() {
                           newInstructors.splice(index, 1);
                         }
                       }
-                      console.log('newInstrucotrs after', newInstructors);
-                      return {...course, instructors:newInstructors};
+                      return { ...course, instructors: newInstructors };
                     });
                   }
                 }
@@ -105,32 +68,32 @@ export default function AddCourseView() {
         <hr />
         <FormGroup>
           <Label for="courseDescription">Description</Label>
-          <Input type="textarea" name="courseDescription" id="courseDescription" onChange={e=>{
-            setCourse({...course, description:e.target.value});
-          }}/>
+          <Input type="textarea" name="courseDescription" id="courseDescription" onChange={e => {
+            setCourse({ ...course, description: e.target.value });
+          }} />
         </FormGroup>
         <h2>Dates</h2>
         <FormGroup>
           <Label for="startDate">Start date:</Label>
-          <Input type="date" name="startDate" id="startDate" placeholder="Start date..." onChange={e=>{
-            setCourse((prevState)=>{
-              const newDates = {start_date:e.target.value, end_date:prevState.dates.end_date};
+          <Input type="date" name="startDate" id="startDate" placeholder="Start date..." onChange={e => {
+            setCourse((prevState) => {
+              const newDates = { start_date: e.target.value, end_date: prevState.dates.end_date };
 
-              return {...course,  dates:newDates};
+              return { ...course, dates: newDates };
             });
           }}
-        />
+          />
         </FormGroup>
         <FormGroup>
           <Label for="endDate">End date:</Label>
-          <Input type="date" name="endDate" id="endDate" placeholder="End date..." onChange={e=>{
-            setCourse((prevState)=>{
-              const newDates = {start_date:prevState.dates.start_date, end_date:e.target.value};
+          <Input type="date" name="endDate" id="endDate" placeholder="End date..." onChange={e => {
+            setCourse((prevState) => {
+              const newDates = { start_date: prevState.dates.start_date, end_date: e.target.value };
 
-              return {...course,  dates:newDates};
+              return { ...course, dates: newDates };
             });
           }}
-        />
+          />
         </FormGroup>
         <hr />
         <h2>Price</h2>
@@ -153,7 +116,22 @@ export default function AddCourseView() {
           />
         </FormGroup>
         <hr />
-        <Button color="primary" className=" float-right">Submit</Button>
+        <Button color="primary" className=" float-right"
+          onClick={e => {
+            e.preventDefault();
+
+            fetch(COURSES, {
+              method: "POST",
+              body: JSON.stringify(course),
+              headers: {
+                "Content-type": "application/json; charset=UTF-8"
+              }
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.log(error));
+          }}
+        >Submit</Button>
       </Form>
     </Jumbotron>
   );
