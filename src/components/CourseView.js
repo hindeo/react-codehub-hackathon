@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Container, Row, Col, Button, CardDeck, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Row, Col, Button, CardGroup, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { useCourse, useInstructors } from '../hooks';
 import { COURSES } from '../api';
 import InstructorCard from './InstructorCard';
@@ -12,21 +12,25 @@ export default function CourseView({ match }) {
   const [modal, setModal] = useState(false);
   let history = useHistory();
 
-  const toggle = (answer) => {
-    // if (answer) {
-    //   fetch(COURSES, {
-    //     method: "POST",
-    //     body: JSON.stringify(course),
-    //     headers: {
-    //       "Content-type": "application/json; charset=UTF-8"
-    //     }
-    //   })
-    //     .then(response => response.json())
-    //     .then(data => console.log(data))
-    //     .catch(error => console.log(error));
-    // };
+  const toggle = () => {
     setModal(!modal);
   };
+
+  const confirmDelete = () => {
+    fetch(`${COURSES}/${course.id}`, {
+      method: "DELETE",
+      body: JSON.stringify(course),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        history.goBack();
+      })
+      .catch(error => console.log(error));
+  }
 
   const instructorCards = instructors.map(instr => <InstructorCard key={instr.id} info={instr} />)
   return (
@@ -54,9 +58,9 @@ export default function CourseView({ match }) {
         </Row>
         <Row>
           <Col>
-            <CardDeck>
+            <CardGroup>
               {instructorCards}
-            </CardDeck>
+            </CardGroup>
           </Col>
         </Row>
         <Row>
@@ -72,7 +76,7 @@ export default function CourseView({ match }) {
           Are you sure?
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" onClick={toggle}>Yes</Button>{' '}
+          <Button color="danger" onClick={confirmDelete}>Yes</Button>{' '}
           <Button color="primary" onClick={toggle}>No</Button>
         </ModalFooter>
       </Modal>

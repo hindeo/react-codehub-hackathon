@@ -18,6 +18,6 @@ export default function useCourses() {
       .catch(error => {
         console.log(error)
       });
-  }, [])
+  }, [courses])
   return courses;
 }
