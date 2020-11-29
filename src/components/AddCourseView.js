@@ -1,15 +1,33 @@
 import { Jumbotron, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { COURSES } from '../api';
 import {useCourse, useInstructors} from '../hooks';
+import { useHistory } from "react-router-dom";
 
 export default function AddCourseView() {
 
   const [instructors] = useInstructors([]);
   const [course, setCourse] = useCourse();
 
+  let history = useHistory();
   return (
     <Jumbotron>
-      <Form>
+      <Form onSubmit={e => {
+            e.preventDefault();
+
+            fetch(COURSES, {
+              method: "POST",
+              body: JSON.stringify(course),
+              headers: {
+                "Content-type": "application/json; charset=UTF-8"
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)
+              history.goBack();
+            })
+            .catch(error => console.log(error));
+          }}>
         <h2>Add Course</h2>
         <FormGroup>
           <Label for="courseTitle">Title</Label>
@@ -116,22 +134,7 @@ export default function AddCourseView() {
           />
         </FormGroup>
         <hr />
-        <Button color="primary" className=" float-right"
-          onClick={e => {
-            e.preventDefault();
-
-            fetch(COURSES, {
-              method: "POST",
-              body: JSON.stringify(course),
-              headers: {
-                "Content-type": "application/json; charset=UTF-8"
-              }
-            })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.log(error));
-          }}
-        >Submit</Button>
+        <Button color="primary" className=" float-right">Submit</Button>
       </Form>
     </Jumbotron>
   );
